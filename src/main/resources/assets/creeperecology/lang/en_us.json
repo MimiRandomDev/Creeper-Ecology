@@ -1,7 +1,10 @@
 {
-  "itemGroup.creeperecology": "Example Mod Tab",
-  "block.creeperecology.example_block": "Example Block",
-  "item.creeperecology.example_item": "Example Item",
+  "itemGroup.creeperecology": "Creeper Ecology",
+
+  "block.creeperecology.gunpowder_sand": "Gunpowder Sand",
+  "block.creeperecology.gunpowder_calcite": "Gunpowder Calcite",
+  "block.creeperecology.sulfurous_deepslate": "Sulfurous Deepslate",
+  "block.creeperecology.creeper_core": "Creeper Core",
 
   "creeperecology.configuration.title": "Creeper Ecology Configs",
   "creeperecology.configuration.section.creeperecology.common.toml": "Creeper Ecology Configs",
