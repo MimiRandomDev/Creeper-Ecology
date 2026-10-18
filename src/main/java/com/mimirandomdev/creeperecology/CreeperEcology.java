@@ -44,15 +44,16 @@ public class CreeperEcology {
     /** Main creative tab ("creeperecology:main"), placed before the combat tab. */
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN_TAB =
             CREATIVE_MODE_TABS.register("main", () -> CreativeModeTab.builder()
-                    // Language key for the tab title, defined in en_us.json.
+                    // Language key for the tab title, defined in the lang files.
                     .title(Component.translatable("itemGroup.creeperecology"))
                     .withTabsBefore(CreativeModeTabs.COMBAT)
-                    .icon(() -> ModBlocks.GUNPOWDER_SAND_ITEM.get().getDefaultInstance())
+                    .icon(() -> ModBlocks.GUNPOWDER_SAND.asItem().getDefaultInstance())
                     .displayItems((parameters, output) -> {
-                        output.accept(ModBlocks.GUNPOWDER_SAND_ITEM.get());
-                        output.accept(ModBlocks.GUNPOWDER_CALCITE_ITEM.get());
-                        output.accept(ModBlocks.SULFUROUS_DEEPSLATE_ITEM.get());
-                        output.accept(ModBlocks.CREEPER_CORE_ITEM.get());
+                        // A DeferredBlock is an ItemLike, so it can be accepted directly.
+                        output.accept(ModBlocks.GUNPOWDER_SAND);
+                        output.accept(ModBlocks.GUNPOWDER_CALCITE);
+                        output.accept(ModBlocks.SULFUROUS_DEEPSLATE);
+                        output.accept(ModBlocks.CREEPER_CORE);
                     }).build());
 
     /**

@@ -2,7 +2,6 @@ package com.mimirandomdev.creeperecology.registry;
 
 import com.mimirandomdev.creeperecology.CreeperEcology;
 
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -10,15 +9,18 @@ import net.minecraft.world.level.material.MapColor;
 
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
- * Central registry for every block (and its matching {@link BlockItem}) added by Creeper Ecology.
+ * Central registry for every block (and its matching block item) added by Creeper Ecology.
  *
  * <p>Both deferred registers declared here MUST be attached to the mod event bus by calling
  * {@link #register(IEventBus)} from the mod constructor. Otherwise nothing declared in this
  * class is ever registered in the game.</p>
+ *
+ * <p>Each block is declared with {@link #registerBlockWithItem(String, BlockBehaviour.Properties)},
+ * which registers the block and its item under the same name. A {@link DeferredBlock} can be used
+ * wherever an item is expected (for example in a creative tab), so no separate item fields are kept.</p>
  *
  * <p>Blocks that belong to the underground "nest geode" structure:</p>
  * <ul>
@@ -42,16 +44,30 @@ public final class ModBlocks {
     public static final DeferredRegister.Items ITEMS =
             DeferredRegister.createItems(CreeperEcology.MODID);
 
-    // ---------------------------------------------------------------------
-    // Gunpowder Sand
-    // ---------------------------------------------------------------------
+    /**
+     * Registers a simple block and its block item under the same name.
+     *
+     * <p>The item registration works by side effect, so only the block holder is returned.</p>
+     *
+     * @param name       registry name, without namespace (for example {@code "gunpowder_sand"})
+     * @param properties properties of the block
+     * @return the deferred holder of the registered block
+     */
+    private static DeferredBlock<Block> registerBlockWithItem(
+            String name,
+            BlockBehaviour.Properties properties
+    ) {
+        DeferredBlock<Block> block = BLOCKS.registerSimpleBlock(name, properties);
+        ITEMS.registerSimpleBlockItem(name, block);
+        return block;
+    }
 
     /**
      * Gunpowder Sand. Soft, sand-like block that forms the interior floor of the geode.
      * Currently a plain (non-falling) block.
      */
     public static final DeferredBlock<Block> GUNPOWDER_SAND =
-            BLOCKS.registerSimpleBlock(
+            registerBlockWithItem(
                     "gunpowder_sand",
                     BlockBehaviour.Properties.of()
                             .mapColor(MapColor.SAND)
@@ -59,17 +75,9 @@ public final class ModBlocks {
                             .sound(SoundType.SAND)
             );
 
-    /** Item form of {@link #GUNPOWDER_SAND}. */
-    public static final DeferredItem<BlockItem> GUNPOWDER_SAND_ITEM =
-            ITEMS.registerSimpleBlockItem("gunpowder_sand", GUNPOWDER_SAND);
-
-    // ---------------------------------------------------------------------
-    // Gunpowder Calcite
-    // ---------------------------------------------------------------------
-
     /** Gunpowder Calcite. Crystalline lining of the inner wall of the geode. */
     public static final DeferredBlock<Block> GUNPOWDER_CALCITE =
-            BLOCKS.registerSimpleBlock(
+            registerBlockWithItem(
                     "gunpowder_calcite",
                     BlockBehaviour.Properties.of()
                             .mapColor(MapColor.TERRACOTTA_WHITE)
@@ -77,31 +85,15 @@ public final class ModBlocks {
                             .sound(SoundType.CALCITE)
             );
 
-    /** Item form of {@link #GUNPOWDER_CALCITE}. */
-    public static final DeferredItem<BlockItem> GUNPOWDER_CALCITE_ITEM =
-            ITEMS.registerSimpleBlockItem("gunpowder_calcite", GUNPOWDER_CALCITE);
-
-    // ---------------------------------------------------------------------
-    // Sulfurous Deepslate
-    // ---------------------------------------------------------------------
-
     /** Sulfurous Deepslate. Hard outer crust that isolates the geode from the surrounding stone. */
     public static final DeferredBlock<Block> SULFUROUS_DEEPSLATE =
-            BLOCKS.registerSimpleBlock(
+            registerBlockWithItem(
                     "sulfurous_deepslate",
                     BlockBehaviour.Properties.of()
                             .mapColor(MapColor.DEEPSLATE)
                             .strength(3.0F)
                             .sound(SoundType.DEEPSLATE)
             );
-
-    /** Item form of {@link #SULFUROUS_DEEPSLATE}. */
-    public static final DeferredItem<BlockItem> SULFUROUS_DEEPSLATE_ITEM =
-            ITEMS.registerSimpleBlockItem("sulfurous_deepslate", SULFUROUS_DEEPSLATE);
-
-    // ---------------------------------------------------------------------
-    // Creeper Core
-    // ---------------------------------------------------------------------
 
     /**
      * Creeper Core. Placed at the geometric center of the geode.
@@ -110,21 +102,13 @@ public final class ModBlocks {
      * {@code BlockEntity} holding the persistent state that drives juvenile creeper spawning.</p>
      */
     public static final DeferredBlock<Block> CREEPER_CORE =
-            BLOCKS.registerSimpleBlock(
+            registerBlockWithItem(
                     "creeper_core",
                     BlockBehaviour.Properties.of()
                             .mapColor(MapColor.COLOR_YELLOW)
                             .strength(2.0F)
                             .sound(SoundType.STONE)
             );
-
-    /** Item form of {@link #CREEPER_CORE}. */
-    public static final DeferredItem<BlockItem> CREEPER_CORE_ITEM =
-            ITEMS.registerSimpleBlockItem("creeper_core", CREEPER_CORE);
-
-    // ---------------------------------------------------------------------
-    // Registration
-    // ---------------------------------------------------------------------
 
     /**
      * Attaches the block and item registers to the given mod event bus.
