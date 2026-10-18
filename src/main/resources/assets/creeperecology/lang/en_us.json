@@ -1,0 +1,13 @@
+{
+  "itemGroup.creeperecology": "Example Mod Tab",
+  "block.creeperecology.example_block": "Example Block",
+  "item.creeperecology.example_item": "Example Item",
+
+  "creeperecology.configuration.title": "Creeper Ecology Configs",
+  "creeperecology.configuration.section.creeperecology.common.toml": "Creeper Ecology Configs",
+  "creeperecology.configuration.section.creeperecology.common.toml.title": "Creeper Ecology Configs",
+  "creeperecology.configuration.items": "Item List",
+  "creeperecology.configuration.logDirtBlock": "Log Dirt Block",
+  "creeperecology.configuration.magicNumberIntroduction": "Magic Number Text",
+  "creeperecology.configuration.magicNumber": "Magic Number"
+}
