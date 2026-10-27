@@ -23,7 +23,10 @@ import net.minecraft.world.level.material.MapColor;
  */
 public enum BlockDefinition {
 
-    /** Interior floor of the nest geode and scattered patches outside it. */
+    /**
+     * Interior floor of the nest geode and scattered patches outside it.
+     * Falls like sand and remains vulnerable to explosions.
+     */
     GUNPOWDER_SAND(
             "gunpowder_sand",
             () -> BlockBehaviour.Properties.of()
@@ -36,36 +39,50 @@ public enum BlockDefinition {
             )
     ),
 
-    /** Crystalline lining of the inner wall of the geode. */
+    /**
+     * Crystalline lining of the inner wall of the geode.
+     * Has the same hardness as vanilla calcite and extremely high explosion resistance.
+     * Requires at least a wooden pickaxe to drop.
+     */
     GUNPOWDER_CALCITE(
             "gunpowder_calcite",
             () -> BlockBehaviour.Properties.of()
                     .mapColor(MapColor.TERRACOTTA_WHITE)
-                    .strength(1.5F)
-                    .sound(SoundType.CALCITE),
+                    .strength(0.75F, 3_600_000.0F)
+                    .sound(SoundType.CALCITE)
+                    .requiresCorrectToolForDrops(),
             Block::new
     ),
 
-    /** Hard outer crust that isolates the geode from the surrounding stone. */
+    /**
+     * Hard outer crust that isolates the geode from the surrounding stone.
+     * Has a hardness of 2 and can withstand ordinary explosions, including TNT.
+     * Requires at least a wooden pickaxe to drop.
+     */
     SULFUROUS_DEEPSLATE(
             "sulfurous_deepslate",
             () -> BlockBehaviour.Properties.of()
                     .mapColor(MapColor.DEEPSLATE)
-                    .strength(3.0F)
-                    .sound(SoundType.DEEPSLATE),
+                    .strength(2.0F, 1_200.0F)
+                    .sound(SoundType.DEEPSLATE)
+                    .requiresCorrectToolForDrops(),
             Block::new
     ),
 
     /**
      * Geometric center of the geode, origin of juvenile creepers.
-     * Provisional: it will get its own block class with a {@code BlockEntity}.
+     * Has the same hardness as vanilla deepslate and extremely high explosion resistance.
+     * Requires at least a wooden pickaxe, so the experience it will drop is only given with one.
+     *
+     * <p>Provisional: it will get its own block class with a {@code BlockEntity}.</p>
      */
     CREEPER_CORE(
             "creeper_core",
             () -> BlockBehaviour.Properties.of()
                     .mapColor(MapColor.COLOR_YELLOW)
-                    .strength(2.0F)
-                    .sound(SoundType.STONE),
+                    .strength(3.0F, 3_600_000.0F)
+                    .sound(SoundType.STONE)
+                    .requiresCorrectToolForDrops(),
             Block::new
     );
 
