@@ -1,0 +1,16 @@
+{
+  "itemGroup.creeperecology": "Creeper Ecology",
+
+  "block.creeperecology.gunpowder_sand": "Arena de pólvora",
+  "block.creeperecology.gunpowder_calcite": "Calcita de pólvora",
+  "block.creeperecology.sulfurous_deepslate": "Pizarra azufrada",
+  "block.creeperecology.creeper_core": "Núcleo de pólvora",
+
+  "creeperecology.configuration.title": "Configuración de Creeper Ecology",
+  "creeperecology.configuration.section.creeperecology.common.toml": "Configuración de Creeper Ecology",
+  "creeperecology.configuration.section.creeperecology.common.toml.title": "Configuración de Creeper Ecology",
+  "creeperecology.configuration.items": "Lista de ítems",
+  "creeperecology.configuration.logDirtBlock": "Registrar bloque de tierra",
+  "creeperecology.configuration.magicNumberIntroduction": "Texto del número mágico",
+  "creeperecology.configuration.magicNumber": "Número mágico"
+}
