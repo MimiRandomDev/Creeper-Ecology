@@ -3,7 +3,9 @@ package com.mimirandomdev.creeperecology.registry;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import net.minecraft.util.ColorRGBA;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ColoredFallingBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -28,7 +30,10 @@ public enum BlockDefinition {
                     .mapColor(MapColor.SAND)
                     .strength(0.5F)
                     .sound(SoundType.SAND),
-            Block::new
+            properties -> new ColoredFallingBlock(
+                    new ColorRGBA(0xE5C84B),
+                    properties
+            )
     ),
 
     /** Crystalline lining of the inner wall of the geode. */
