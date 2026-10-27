@@ -2,6 +2,7 @@ package com.mimirandomdev.creeperecology;
 
 import org.slf4j.Logger;
 
+import com.mimirandomdev.creeperecology.registry.BlockDefinition;
 import com.mimirandomdev.creeperecology.registry.ModBlocks;
 import com.mojang.logging.LogUtils;
 
@@ -25,56 +26,70 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 /**
  * Main entry point of the Creeper Ecology mod.
  *
- * <p>Blocks and block items live in {@link ModBlocks}. This class only wires the registers to the
- * mod event bus and defines the mod's creative tab.</p>
+ * <p>Blocks and their associated items are registered through {@link ModBlocks}.
+ * This class connects the registries to the mod event bus and defines the
+ * mod's creative tab.</p>
  */
 @Mod(CreeperEcology.MODID)
 public class CreeperEcology {
 
-    /** Mod id. Must match the entry in META-INF/neoforge.mods.toml. */
+    /** The mod ID. Must match the entry in META-INF/neoforge.mods.toml. */
     public static final String MODID = "creeperecology";
 
-    /** Shared logger for the whole mod. */
+    /** Shared logger for the mod. */
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    /** Deferred register for creative tabs, under the "creeperecology" namespace. */
+    /** Deferred register for the mod's creative tabs. */
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
-    /** Main creative tab ("creeperecology:main"), placed before the combat tab. */
+    /**
+     * Main creative tab for Creeper Ecology.
+     *
+     * <p>Its icon is the gunpowder sand block, and its contents are generated
+     * automatically from the constants declared in {@link BlockDefinition}.</p>
+     */
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN_TAB =
             CREATIVE_MODE_TABS.register("main", () -> CreativeModeTab.builder()
-                    // Language key for the tab title, defined in en_us.json.
                     .title(Component.translatable("itemGroup.creeperecology"))
                     .withTabsBefore(CreativeModeTabs.COMBAT)
-                    .icon(() -> ModBlocks.GUNPOWDER_SAND_ITEM.get().getDefaultInstance())
+                    .icon(() -> ModBlocks.getBlock(BlockDefinition.GUNPOWDER_SAND)
+                            .asItem()
+                            .getDefaultInstance())
                     .displayItems((parameters, output) -> {
-                        output.accept(ModBlocks.GUNPOWDER_SAND_ITEM.get());
-                        output.accept(ModBlocks.GUNPOWDER_CALCITE_ITEM.get());
-                        output.accept(ModBlocks.SULFUROUS_DEEPSLATE_ITEM.get());
-                        output.accept(ModBlocks.CREEPER_CORE_ITEM.get());
-                    }).build());
+                        for (BlockDefinition definition : BlockDefinition.values()) {
+                            output.accept(ModBlocks.getBlock(definition));
+                        }
+                    })
+                    .build());
 
     /**
-     * Mod constructor. FML injects the {@link IEventBus} and {@link ModContainer} parameters.
+     * Initializes the mod and registers its event listeners and registries.
      *
-     * @param modEventBus  the mod event bus
-     * @param modContainer the container of this mod
+     * @param modEventBus  the event bus provided by NeoForge for this mod
+     * @param modContainer the container associated with this mod
      */
     public CreeperEcology(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
 
-        // Without these calls nothing gets registered in the game.
+        // Register blocks and their associated items.
         ModBlocks.register(modEventBus);
+
+        // Register the creative tab.
         CREATIVE_MODE_TABS.register(modEventBus);
 
-        // Needed because this class has @SubscribeEvent methods (onServerStarting).
+        // Register this instance on the NeoForge event bus.
         NeoForge.EVENT_BUS.register(this);
 
-        // Creates and loads the common config file.
+        // Register the common configuration.
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
+    /**
+     * Performs common setup tasks.
+     *
+     * @param event the common setup event
+     */
     private void commonSetup(FMLCommonSetupEvent event) {
         LOGGER.info("HELLO FROM COMMON SETUP");
 
@@ -82,11 +97,19 @@ public class CreeperEcology {
             LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
         }
 
-        LOGGER.info("{}{}", Config.MAGIC_NUMBER_INTRODUCTION.get(), Config.MAGIC_NUMBER.getAsInt());
+        LOGGER.info("{}{}", Config.MAGIC_NUMBER_INTRODUCTION.get(),
+                Config.MAGIC_NUMBER.getAsInt());
 
-        Config.ITEM_STRINGS.get().forEach((item) -> LOGGER.info("ITEM >> {}", item));
+        Config.ITEM_STRINGS.get().forEach(
+                item -> LOGGER.info("ITEM >> {}", item)
+        );
     }
 
+    /**
+     * Handles the server starting event.
+     *
+     * @param event the server starting event
+     */
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
         LOGGER.info("HELLO from server starting");

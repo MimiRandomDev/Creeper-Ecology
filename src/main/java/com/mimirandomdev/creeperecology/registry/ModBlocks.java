@@ -2,31 +2,25 @@ package com.mimirandomdev.creeperecology.registry;
 
 import com.mimirandomdev.creeperecology.CreeperEcology;
 
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.MapColor;
 
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 /**
- * Central registry for every block (and its matching {@link BlockItem}) added by Creeper Ecology.
+ * Central registry for all blocks and their associated items in Creeper Ecology.
  *
- * <p>Both deferred registers declared here MUST be attached to the mod event bus by calling
- * {@link #register(IEventBus)} from the mod constructor. Otherwise nothing declared in this
- * class is ever registered in the game.</p>
+ * <p>Block definitions are declared in {@link BlockDefinition} and registered
+ * automatically during class initialization. Each block is stored in an
+ * {@link EnumMap} for lookup by its definition.</p>
  *
- * <p>Blocks that belong to the underground "nest geode" structure:</p>
- * <ul>
- *   <li>{@link #GUNPOWDER_SAND}: interior floor of the geode and scattered patches outside it.</li>
- *   <li>{@link #GUNPOWDER_CALCITE}: inner wall of the geode.</li>
- *   <li>{@link #SULFUROUS_DEEPSLATE}: outer crust of the geode.</li>
- *   <li>{@link #CREEPER_CORE}: geometric center of the geode, origin of juvenile creepers.</li>
- * </ul>
+ * <p>Order matters in this class: {@link #BLOCKS}, {@link #ITEMS} and the map must be declared
+ * before the static initializer that fills them, otherwise they would still be {@code null}.</p>
  */
 public final class ModBlocks {
 
@@ -34,103 +28,63 @@ public final class ModBlocks {
         // Static registry holder, not meant to be instantiated.
     }
 
-    /** Deferred register for all blocks of the mod, under the "creeperecology" namespace. */
+    /** Deferred register for all blocks of the mod. */
     public static final DeferredRegister.Blocks BLOCKS =
             DeferredRegister.createBlocks(CreeperEcology.MODID);
 
-    /** Deferred register for all items of the mod, under the "creeperecology" namespace. */
+    /** Deferred register for all items of the mod. */
     public static final DeferredRegister.Items ITEMS =
             DeferredRegister.createItems(CreeperEcology.MODID);
 
-    // ---------------------------------------------------------------------
-    // Gunpowder Sand
-    // ---------------------------------------------------------------------
+    /** Registered block of each definition, filled by the static initializer below. */
+    private static final Map<BlockDefinition, DeferredBlock<Block>> BLOCKS_BY_DEFINITION =
+            new EnumMap<>(BlockDefinition.class);
 
     /**
-     * Gunpowder Sand. Soft, sand-like block that forms the interior floor of the geode.
-     * Currently a plain (non-falling) block.
-     */
-    public static final DeferredBlock<Block> GUNPOWDER_SAND =
-            BLOCKS.registerSimpleBlock(
-                    "gunpowder_sand",
-                    BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.SAND)
-                            .strength(0.5F)
-                            .sound(SoundType.SAND)
-            );
-
-    /** Item form of {@link #GUNPOWDER_SAND}. */
-    public static final DeferredItem<BlockItem> GUNPOWDER_SAND_ITEM =
-            ITEMS.registerSimpleBlockItem("gunpowder_sand", GUNPOWDER_SAND);
-
-    // ---------------------------------------------------------------------
-    // Gunpowder Calcite
-    // ---------------------------------------------------------------------
-
-    /** Gunpowder Calcite. Crystalline lining of the inner wall of the geode. */
-    public static final DeferredBlock<Block> GUNPOWDER_CALCITE =
-            BLOCKS.registerSimpleBlock(
-                    "gunpowder_calcite",
-                    BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.TERRACOTTA_WHITE)
-                            .strength(1.5F)
-                            .sound(SoundType.CALCITE)
-            );
-
-    /** Item form of {@link #GUNPOWDER_CALCITE}. */
-    public static final DeferredItem<BlockItem> GUNPOWDER_CALCITE_ITEM =
-            ITEMS.registerSimpleBlockItem("gunpowder_calcite", GUNPOWDER_CALCITE);
-
-    // ---------------------------------------------------------------------
-    // Sulfurous Deepslate
-    // ---------------------------------------------------------------------
-
-    /** Sulfurous Deepslate. Hard outer crust that isolates the geode from the surrounding stone. */
-    public static final DeferredBlock<Block> SULFUROUS_DEEPSLATE =
-            BLOCKS.registerSimpleBlock(
-                    "sulfurous_deepslate",
-                    BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.DEEPSLATE)
-                            .strength(3.0F)
-                            .sound(SoundType.DEEPSLATE)
-            );
-
-    /** Item form of {@link #SULFUROUS_DEEPSLATE}. */
-    public static final DeferredItem<BlockItem> SULFUROUS_DEEPSLATE_ITEM =
-            ITEMS.registerSimpleBlockItem("sulfurous_deepslate", SULFUROUS_DEEPSLATE);
-
-    // ---------------------------------------------------------------------
-    // Creeper Core
-    // ---------------------------------------------------------------------
-
-    /**
-     * Creeper Core. Placed at the geometric center of the geode.
+     * Registers a block and its item using the given definition.
      *
-     * <p>Provisional: this is a plain block for now. It will later become a block with a
-     * {@code BlockEntity} holding the persistent state that drives juvenile creeper spawning.</p>
+     * @param definition the definition with the name, properties and factory of the block
+     * @return the deferred holder of the registered block
      */
-    public static final DeferredBlock<Block> CREEPER_CORE =
-            BLOCKS.registerSimpleBlock(
-                    "creeper_core",
-                    BlockBehaviour.Properties.of()
-                            .mapColor(MapColor.COLOR_YELLOW)
-                            .strength(2.0F)
-                            .sound(SoundType.STONE)
-            );
+    private static DeferredBlock<Block> registerBlockWithItem(BlockDefinition definition) {
+        String name = definition.getName();
 
-    /** Item form of {@link #CREEPER_CORE}. */
-    public static final DeferredItem<BlockItem> CREEPER_CORE_ITEM =
-            ITEMS.registerSimpleBlockItem("creeper_core", CREEPER_CORE);
+        BlockBehaviour.Properties properties = definition.getPropertiesSupplier().get();
 
-    // ---------------------------------------------------------------------
-    // Registration
-    // ---------------------------------------------------------------------
+        DeferredBlock<Block> block = BLOCKS.registerBlock(
+                name,
+                definition.getBlockFactory(),
+                properties
+        );
+
+        ITEMS.registerSimpleBlockItem(name, block);
+
+        return block;
+    }
+
+    // Registers every constant of BlockDefinition. Must stay below the fields it uses.
+    static {
+        for (BlockDefinition definition : BlockDefinition.values()) {
+            BLOCKS_BY_DEFINITION.put(definition, registerBlockWithItem(definition));
+        }
+    }
 
     /**
-     * Attaches the block and item registers to the given mod event bus.
+     * Returns the registered block of the given definition.
+     * Every constant of {@link BlockDefinition} is registered, so the result is never {@code null}.
+     *
+     * @param definition the definition identifying the block
+     * @return the deferred holder of the registered block
+     */
+    public static DeferredBlock<Block> getBlock(BlockDefinition definition) {
+        return BLOCKS_BY_DEFINITION.get(definition);
+    }
+
+    /**
+     * Attaches the block and item registers to the mod event bus.
      * Must be called once from the mod constructor.
      *
-     * @param modEventBus the mod event bus received by the mod constructor
+     * @param modEventBus the mod event bus provided by the mod constructor
      */
     public static void register(IEventBus modEventBus) {
         BLOCKS.register(modEventBus);
